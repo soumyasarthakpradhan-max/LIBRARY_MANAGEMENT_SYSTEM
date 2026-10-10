@@ -1,26 +1,27 @@
 import React, { useState } from "react";
 import "../CSS/SubmitBook.css";
+import { useEffect } from "react";
+import axios from 'axios'
 
 function SubmitBook() {
+   const [history, setHistory]= useState([])
 
-  const [history, setHistory] = useState([
-    {
-      id: 1,
-      student: "Rahul Kumar",
-      book: "React JS Guide",
-      submitDate: "24 Jul 2026",
-      submitTime: "02:30 PM",
-      status: "Submitted",
-    },
-    {
-      id: 2,
-      student: "Priya Sharma",
-      book: "MongoDB Basics",
-      submitDate: "24 Jul 2026",
-      submitTime: "04:10 PM",
-      status: "Submitted",
-    },
-  ]);
+    async function allsubmitBooks() {
+    try {
+      let res = await axios.get("http://localhost:2700/api/submitbooks");
+      
+      setHistory(res.data.data)
+      console.log(res.data.data)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  useEffect(()=>{
+    allsubmitBooks()
+  },[])
+
+ 
 
   const [data, setData] = useState({
     student: "",
@@ -40,12 +41,11 @@ function SubmitBook() {
     const now = new Date();
 
     const newSubmit = {
-      id: Date.now(),
+
       student: data.student,
       book: data.book,
-      submitDate: now.toLocaleDateString(),
-      submitTime: now.toLocaleTimeString(),
-      status: "Submitted",
+ 
+  
     };
 
     setHistory([newSubmit, ...history]);
@@ -101,25 +101,21 @@ function SubmitBook() {
             <tr>
               <th>Student</th>
               <th>Book</th>
-              <th>Submit Date</th>
+              <th>Author</th>
               <th>Submit Time</th>
-              <th>Status</th>
+              
             </tr>
           </thead>
 
           <tbody>
 
             {history.map((item) => (
-              <tr key={item.id}>
-                <td>{item.student}</td>
-                <td>{item.book}</td>
-                <td>{item.submitDate}</td>
-                <td>{item.submitTime}</td>
-                <td>
-                  <span className="submitted">
-                    {item.status}
-                  </span>
-                </td>
+              <tr key={item._id}>
+                <td>{item.studentName}</td>
+                <td>{item.bookName}</td>
+                <td>{item.author}</td>
+                <td>{item.date}</td>
+             
               </tr>
             ))}
 

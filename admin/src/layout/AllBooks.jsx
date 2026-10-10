@@ -1,62 +1,36 @@
+//AllBooks.jsx
 import React, { useState } from "react";
 import "../CSS/AllBooks.css";
+import axios from "axios"
+import { useEffect } from "react";
 
-const books = [
-  {
-    id: 1,
-    title: "React JS Complete Guide",
-    author: "Andrew Clark",
-    category: "Programming",
-    image: "https://picsum.photos/300/400?1",
-    available: true,
-  },
-  {
-    id: 2,
-    title: "JavaScript Mastery",
-    author: "Brendan Eich",
-    category: "Programming",
-    image: "https://picsum.photos/300/400?2",
-    available: false,
-  },
-  {
-    id: 3,
-    title: "Python Basics",
-    author: "Guido Van Rossum",
-    category: "Programming",
-    image: "https://picsum.photos/300/400?3",
-    available: true,
-  },
-  {
-    id: 4,
-    title: "Data Structures",
-    author: "Mark Allen",
-    category: "Computer Science",
-    image: "https://picsum.photos/300/400?4",
-    available: true,
-  },
-  {
-    id: 5,
-    title: "MongoDB Essentials",
-    author: "John Smith",
-    category: "Database",
-    image: "https://picsum.photos/300/400?5",
-    available: false,
-  },
-  {
-    id: 6,
-    title: "Node.js in Action",
-    author: "Ryan Dahl",
-    category: "Backend",
-    image: "https://picsum.photos/300/400?6",
-    available: true,
-  },
-];
 
+  
 function AllBooks() {
   const [search, setSearch] = useState("");
+  let [books, setBooks]= useState([])
+
+  async function getAllBooks() {
+    
+    try{
+
+      let res= await axios.get('http://localhost:2700/api/getAllBooks')
+
+      console.log(res)
+      setBooks(res.data.data)
+
+    }catch(err){
+
+    }
+
+  }
+
+useEffect(()=>{
+    getAllBooks()
+},[])
 
   const filteredBooks = books.filter((book) =>
-    book.title.toLowerCase().includes(search.toLowerCase())
+    book.name.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -75,12 +49,12 @@ function AllBooks() {
       <div className="book-grid">
         {filteredBooks.map((book) => (
           <div className="book-card" key={book.id}>
-            <img src={book.image} alt={book.title} />
+            <img src={book.photo} alt={book.title}  style={{minHeight:'30%'}}/>
 
             <div className="book-content">
               <span>{book.category}</span>
 
-              <h3>{book.title}</h3>
+              <h3>{book.name}</h3>
 
               <p>Author: {book.author}</p>
 

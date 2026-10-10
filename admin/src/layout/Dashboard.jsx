@@ -1,7 +1,60 @@
+//dashboard.jsx
+
+
 import React from "react";
 import "../CSS/Dashboard.css";
+import { useState } from "react";
+import axios from "axios"
+import { useEffect } from "react";
 
 function Dashboard() {
+  let [totalStudent, setTotalStudent]= useState(0)
+  let [totalBook, setTotalBook]= useState(0)
+  let [issuedBooks, setIssuedBook]= useState([])
+
+  async function getStudents(){
+
+
+    try{
+      let allstudent= await axios.get('http://localhost:2700/api/getstudents')
+  
+      setTotalStudent(allstudent.data.data)
+
+       let allbook= await axios.get('http://localhost:2700/api/getAllBooks')
+       setTotalBook(allbook.data.data)
+       let requestbook= await axios.get('http://localhost:2700/api/requestbook')
+       setIssuedBook(requestbook.data.data)
+
+    }catch(err){
+       console.log(err)
+    }
+
+
+  }
+
+ useEffect(()=>{
+   getStudents()
+ },[])
+
+ async function RejectRequest(book){
+   getStudents()
+  let res= await axios.post('http://localhost:2700/api/reject', {book})
+
+ }
+ async function AcceptRequest(book,email){
+
+  console.log(book,email)
+  let obj={
+    book,
+    email
+  }
+
+     getStudents()
+  let res= await axios.post('http://localhost:2700/api/accept', obj)
+      
+
+ }
+
   return (
     <div className="dashboard-home">
 
@@ -12,24 +65,15 @@ function Dashboard() {
       <div className="cards">
 
         <div className="card blue">
-          <h2>520</h2>
+          <h2>{totalStudent.length}</h2>
           <p>Total Students</p>
         </div>
 
         <div className="card green">
-          <h2>1350</h2>
+          <h2>{totalBook.length}</h2>
           <p>Total Books</p>
         </div>
 
-        <div className="card orange">
-          <h2>145</h2>
-          <p>Books Issued</p>
-        </div>
-
-        <div className="card purple">
-          <h2>1120</h2>
-          <p>Books Returned</p>
-        </div>
 
         
 
@@ -57,27 +101,20 @@ function Dashboard() {
 
           <tbody>
 
-            <tr>
-              <td>Rahul Kumar</td>
-              <td>JavaScript</td>
-              <td>24-07-2026</td>
-              <td>Pending</td>
+           {issuedBooks.map((obj, ind)=>{
+            return  <tr>
+              <td>{obj.studentName}</td>
+              <td>{obj.bookName}</td>
+              <td>{obj.date}</td>
+              <td>{obj.status}</td>
               <td>
-                <button className="accept">Accept</button>
-                <button className="reject">Reject</button>
+                <button className="accept" onClick={()=>AcceptRequest(obj.bookName, obj.studentEmail)}>Accept</button>
+                <button className="reject" onClick={()=>RejectRequest(obj.bookName)}>Reject</button>
               </td>
             </tr>
+           })}
 
-            <tr>
-              <td>Priya Sharma</td>
-              <td>React Guide</td>
-              <td>24-07-2026</td>
-              <td>Pending</td>
-              <td>
-                <button className="accept">Accept</button>
-                <button className="reject">Reject</button>
-              </td>
-            </tr>
+            
 
           </tbody>
 

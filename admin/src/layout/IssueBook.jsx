@@ -1,25 +1,23 @@
 import React, { useState } from "react";
 import "../CSS/IssueBook.css";
+import axios from "axios";
+import { useEffect } from "react";
 
 function IssueBook() {
-  const [history, setHistory] = useState([
-    {
-      id: 1,
-      student: "Rahul Kumar",
-      book: "React JS Guide",
-      issueDate: "24 Jul 2026",
-      issueTime: "10:15 AM",
-      status: "Issued",
-    },
-    {
-      id: 2,
-      student: "Priya Sharma",
-      book: "MongoDB Basics",
-      issueDate: "24 Jul 2026",
-      issueTime: "11:45 AM",
-      status: "Issued",
-    },
-  ]);
+  const [history, setHistory] = useState([])
+  async function allissueBooks() {
+    try {
+      let res = await axios.get("http://localhost:2700/api/issuebooks");
+      console.log(res)
+      setHistory(res.data.data)
+    } catch (err) {}
+  }
+
+  useEffect(()=>{
+    allissueBooks()
+  },[])
+
+  
 
   const [data, setData] = useState({
     student: "",
@@ -39,12 +37,10 @@ function IssueBook() {
     const now = new Date();
 
     const newIssue = {
-      id: Date.now(),
+     
       student: data.student,
       book: data.book,
-      issueDate: now.toLocaleDateString(),
-      issueTime: now.toLocaleTimeString(),
-      status: "Issued",
+   
     };
 
     setHistory([newIssue, ...history]);
@@ -59,13 +55,10 @@ function IssueBook() {
 
   return (
     <div className="issue-page">
-
       <div className="issue-form">
-
         <h2>Issue Book</h2>
 
         <form onSubmit={issueBook}>
-
           <input
             type="text"
             name="student"
@@ -85,49 +78,36 @@ function IssueBook() {
           />
 
           <button>Issue Book</button>
-
         </form>
-
       </div>
 
       <div className="history">
-
         <h2>Previous Book Issue History</h2>
 
         <table>
-
           <thead>
             <tr>
               <th>Student</th>
               <th>Book</th>
-              <th>Issue Date</th>
+              <th>Author</th>
               <th>Issue Time</th>
-              <th>Status</th>
+             
             </tr>
           </thead>
 
           <tbody>
-
             {history.map((item) => (
-              <tr key={item.id}>
-                <td>{item.student}</td>
-                <td>{item.book}</td>
-                <td>{item.issueDate}</td>
-                <td>{item.issueTime}</td>
-                <td>
-                  <span className="issued">
-                    {item.status}
-                  </span>
-                </td>
+              <tr key={item._id}>
+                <td>{item.studentName}</td>
+                <td>{item.bookName}</td>
+                <td>{item.author}</td>
+                <td>{item.date}</td>
+             
               </tr>
             ))}
-
           </tbody>
-
         </table>
-
       </div>
-
     </div>
   );
 }
